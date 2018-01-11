@@ -8,7 +8,7 @@ import Counter from './components/Counter';
 
 export const routes = <Layout>
     <Route exact path='/' component={Home} />
-    <Route path='/fetchdatasources/:startDateIndex?' component={FetchDataSources} />
+    <Route path='/fetchdatasources/:startDateIndex?/:forDataSource?' component={FetchDataSources} />
     <Route path='/counter' component={ Counter } />
     <Route path='/fetchdata/:startDateIndex?' component={ FetchData } />
 </Layout>;

@@ -8,19 +8,21 @@ import * as DataSourcesState from '../store/DataSources';
 type DataSourceProps =
     DataSourcesState.DataSourcesState        // ... state we've requested from the Redux store
     & typeof DataSourcesState.actionCreators      // ... plus action creators we've requested
-    & RouteComponentProps<{ startDateIndex: string}>; // ... plus incoming routing parameters
+    & RouteComponentProps<{ startDateIndex: string, forDataSource: string}>; // ... plus incoming routing parameters
 
 class FetchDataSources extends React.Component<DataSourceProps, {}> {
     componentWillMount() {
         // This method runs when the component is first added to the page
         let startDateIndex = parseInt(this.props.match.params.startDateIndex) || 0;
-        this.props.requestDataSources(startDateIndex);
+        let dataRequest = { dataSourceName: (this.props.match.params.forDataSource || '') };
+        this.props.requestDataSources(startDateIndex, dataRequest);
     }
 
     componentWillReceiveProps(nextProps: DataSourceProps) {
         // This method runs when incoming props (e.g., route params) change
         let startDateIndex = parseInt(nextProps.match.params.startDateIndex) || 0;
-        this.props.requestDataSources(startDateIndex);
+        let dataRequest = { dataSourceName: (this.props.match.params.forDataSource || '') };
+        this.props.requestDataSources(startDateIndex, dataRequest);
     }
 
     public render() {
@@ -52,6 +54,7 @@ class FetchDataSources extends React.Component<DataSourceProps, {}> {
     }
 
     private renderDataSourcesTable() {
+        let submitIndex = -1;
         return <table className='table'>
             <thead>
                 <tr>
@@ -63,6 +66,7 @@ class FetchDataSources extends React.Component<DataSourceProps, {}> {
             <tbody>
                 {this.props.datasources.map(datasource =>
                     <tr key={datasource.commonName}>
+                        <td><Link className='btn btn-default pull-left' to={`/fetchdatasources/${submitIndex}/${datasource.commonName}`}>{datasource.commonName}</Link></td>
                         <td>{datasource.fieldX}</td>
                         {false ? <td>TBD</td> : []}
                     </tr>
@@ -89,7 +93,9 @@ class FetchDataSources extends React.Component<DataSourceProps, {}> {
     }
 
     private renderSubmitButton() {
-        <!--Strech Goal-->
+        {
+            //"Stretch Goal"
+        }
     }
 }
 

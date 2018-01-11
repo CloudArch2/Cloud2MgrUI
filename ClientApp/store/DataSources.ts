@@ -8,13 +8,19 @@ import { AppThunkAction } from './';
 export interface DataSourcesState {
     isLoading: boolean;
     startDateIndex?: number;
+    forDataSource?: string;
+    startDate?: Date;
+    endDate?: Date;
     datasources: DataSource[];
 }
-
 
 export interface DataSource {
     commonName: string;
     fieldX: string[];
+}
+
+export interface DataRequest {
+    dataSourceName: string;
 }
 
 // -----------------
@@ -32,17 +38,62 @@ interface ReceiveDataSourcesAction{
     datasources: DataSource[];
 }
 
+interface SubmitDataRequestAction {
+    type: 'SUBMIT_DATAREQUEST';
+    startDateIndex: number;
+    forDataSource: string;
+}
+
+interface SubmitDataRequestCompmleteAction {
+    type: 'SUBMIT_DATAREQUEST_COMPLETE';
+    startDateIndex: number;
+    forDataSource: string;
+    rawresponse?: any;
+
+}
+
 // Declare a 'discriminated union' type. This guarantees that all references to 'type' properties contain one of the
 // declared type strings (and not any other arbitrary string).
-type KnownAction = RequestDataSourcesAction | ReceiveDataSourcesAction;
+type KnownAction = RequestDataSourcesAction | ReceiveDataSourcesAction | SubmitDataRequestAction | SubmitDataRequestCompmleteAction;
 
 // ----------------
 // ACTION CREATORS - These are functions exposed to UI components that will trigger a state transition.
 // They don't directly mutate state, but they can have external side-effects (such as loading data).
 
 export const actionCreators = {
-    requestDataSources: (startDateIndex: number): AppThunkAction<KnownAction> => (dispatch, getState) => {
+    requestDataSources: (startDateIndex: number, dataRequest: DataRequest): AppThunkAction<KnownAction> => (dispatch, getState) => {
         // Only load data if it's something we don't already have (and are not already loading)
+        if (dataRequest.dataSourceName != '' && startDateIndex == -1) { 
+            let dataSources = getState().dataSources.datasources || [];
+            let requestBody = {
+                "QueryRange": {
+                    "End": "10\/24\/2017 10:00:00",
+                    "Start": "10\/23\/2017 10:00:00"
+                },
+                "Sources": [
+                    {
+                        "Fields": dataSources.filter(x => x.commonName == dataRequest.dataSourceName)[0].fieldX || [],
+                        "Name": dataRequest.dataSourceName 
+                    }
+                ],
+                "Stores": [
+                    "1234"
+                ]
+            }
+
+            let fetchDataTask = fetch(`https://fido-queryinvoke-funcapp.azurewebsites.net/api/InvokeQuery?code=ktsBtbU0nduGBT3JF8USAtS6NfPrLn3485L/advxyI4aiUv/m4yaaA==&clientId=default`
+                , {
+                    method: 'post',
+                    body: JSON.stringify(requestBody)
+                })
+                .then(response => response.json() as Promise<any>)
+                .then(data => {
+                    dispatch({ type: 'SUBMIT_DATAREQUEST_COMPLETE', startDateIndex: startDateIndex, forDataSource: dataRequest.dataSourceName, rawresponse: data });
+                });
+
+            addTask(fetchDataTask); // Ensure server-side prerendering waits for this to complete
+            dispatch({ type: 'SUBMIT_DATAREQUEST', startDateIndex: startDateIndex, forDataSource: dataRequest.dataSourceName });
+        } else {
         if (startDateIndex !== getState().dataSources.startDateIndex) {
             let fetchTask = fetch(`api/DataSourcesDummyData/DataSources?startDateIndex=${startDateIndex}`)
                 .then(response => response.json() as Promise<DataSource[]>)
@@ -52,6 +103,7 @@ export const actionCreators = {
 
             addTask(fetchTask); // Ensure server-side prerendering waits for this to complete
             dispatch({ type: 'REQUEST_DATASOURCES', startDateIndex: startDateIndex });
+            }
         }
     }
 };
@@ -81,6 +133,32 @@ export const reducer: Reducer<DataSourcesState> = (state: DataSourcesState, inco
                 };
             }
             break;
+
+        case 'SUBMIT_DATAREQUEST':
+            // Only accept the incoming data if it matches the most recent request. This ensures we correctly
+            // handle out-of-order responses.
+            if (action.forDataSource != '' && action.startDateIndex == -1) {
+                return {
+                    startDateIndex: (action.startDateIndex != -1 ? action.startDateIndex : 0),
+                    isLoading: false,
+                    forDataSource: action.forDataSource,
+                    datasources: state.datasources
+                };
+            }
+            break;
+
+        case 'SUBMIT_DATAREQUEST_COMPLETE':
+            // Only accept the incoming data if it matches the most recent request. This ensures we correctly
+            // handle out-of-order responses.
+            if (action.startDateIndex === state.startDateIndex || action.startDateIndex != -1) {
+                return {
+                    startDateIndex: (action.startDateIndex != -1 ? action.startDateIndex : 0),
+                    isLoading: false,
+                    datasources: state.datasources
+                };
+            }
+            break;
+
         default:
             // The following line guarantees that every action in the KnownAction union has been covered by a case above
             const exhaustiveCheck: never = action;

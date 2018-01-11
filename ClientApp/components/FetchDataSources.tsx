@@ -29,7 +29,26 @@ class FetchDataSources extends React.Component<DataSourceProps, {}> {
             <p>This component demonstrates fetching data from the server and working with URL parameters.</p>
             {this.renderDataSourcesTable()}
             {this.renderPagination()}
+            {this.renderSubmitButton()}
         </div>;
+    }
+
+
+    private renderDateRangeFields() {
+        <table className='table'>
+            <thead>
+                <tr>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>TBD</td>
+                    <td>TBD</td>
+                </tr>
+            </tbody>
+        </table>;
     }
 
     private renderDataSourcesTable() {
@@ -38,14 +57,14 @@ class FetchDataSources extends React.Component<DataSourceProps, {}> {
                 <tr>
                     <th>Data Source Name</th>
                     <th>Fields Available</th>
-                    <th>Selected</th>
+                    {false ? <th>Selected</th> : []}
                 </tr>
             </thead>
             <tbody>
                 {this.props.datasources.map(datasource =>
                     <tr key={datasource.commonName}>
                         <td>{datasource.fieldX}</td>
-                        <td>TBD</td>
+                        {false ? <td>TBD</td> : []}
                     </tr>
                 )}
             </tbody>
@@ -67,6 +86,10 @@ class FetchDataSources extends React.Component<DataSourceProps, {}> {
             <Link className='btn btn-default pull-right' to={`/fetchdatasources/${nextStartDateIndex}`}>Next</Link>
             {this.props.isLoading ? <span>Loading...</span> : []}
         </p>;*/
+    }
+
+    private renderSubmitButton() {
+        <!--Strech Goal-->
     }
 }
 

@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\components\FetchDataSources.tsx" />
     <None Remove="ClientApp\store\DataSources.ts" />
     <None Remove="Properties\PublishProfiles\cloud2fido-mgrui - Web Deploy.pubxml" />
   </ItemGroup>
@@ -30,6 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\components\FetchDataSources.tsx" />
     <TypeScriptCompile Include="ClientApp\store\DataSources.ts" />
   </ItemGroup>
 

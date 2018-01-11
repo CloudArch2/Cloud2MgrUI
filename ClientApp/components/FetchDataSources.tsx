@@ -36,10 +36,9 @@ class FetchDataSources extends React.Component<DataSourceProps, {}> {
         return <table className='table'>
             <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>Temp. (C)</th>
-                    <th>Temp. (F)</th>
-                    <th>Summary</th>
+                    <th>Data Source Name</th>
+                    <th>Fields Available</th>
+                    <th>Selected</th>
                 </tr>
             </thead>
             <tbody>
@@ -56,12 +55,17 @@ class FetchDataSources extends React.Component<DataSourceProps, {}> {
     private renderPagination() {
         let prevStartDateIndex = (this.props.startDateIndex || 0) - 5;
         let nextStartDateIndex = (this.props.startDateIndex || 0) + 5;
+        let refreshIndex = -1;
 
         return <p className='clearfix text-center'>
+            <Link className='btn btn-default pull-left' to={`/fetchdatasources/${refreshIndex}`}>Refresh</Link>
+            {this.props.isLoading ? <span>Loading...</span> : []}
+        </p>;
+        /*return <p className='clearfix text-center'>
             <Link className='btn btn-default pull-left' to={`/fetchdatasources/${prevStartDateIndex}`}>Previous</Link>
             <Link className='btn btn-default pull-right' to={`/fetchdatasources/${nextStartDateIndex}`}>Next</Link>
             {this.props.isLoading ? <span>Loading...</span> : []}
-        </p>;
+        </p>;*/
     }
 }
 

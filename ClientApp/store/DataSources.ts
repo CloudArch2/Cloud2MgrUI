@@ -46,7 +46,7 @@ type KnownAction = RequestDataSourcesAction | ReceiveDataSourcesAction;
 export const actionCreators = {
     requestDataSources: (startDateIndex: number): AppThunkAction<KnownAction> => (dispatch, getState) => {
         // Only load data if it's something we don't already have (and are not already loading)
-        if (startDateIndex !== getState().dataSources.startDateIndex) {
+        if (startDateIndex !== getState().dataSources.startDateIndex || startDateIndex < 0) {
             let fetchTask = fetch(`metadataendpoint`)
                 .then(response => response.json() as Promise<DataSourceResult>)
                 .then(data => {

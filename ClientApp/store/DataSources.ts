@@ -63,7 +63,7 @@ type KnownAction = RequestDataSourcesAction | ReceiveDataSourcesAction | SubmitD
 export const actionCreators = {
     requestDataSources: (startDateIndex: number, dataRequest: DataRequest): AppThunkAction<KnownAction> => (dispatch, getState) => {
         // Only load data if it's something we don't already have (and are not already loading)
-        if (dataRequest.dataSourceName != '' && startDateIndex == -1) { 
+        if (dataRequest.dataSourceName != '' && startDateIndex == -2) { 
             let dataSources = getState().dataSources.datasources || [];
             let requestBody = {
                 "QueryRange": {
@@ -83,6 +83,10 @@ export const actionCreators = {
 
             let fetchDataTask = fetch(`https://fido-queryinvoke-funcapp.azurewebsites.net/api/InvokeQuery?code=ktsBtbU0nduGBT3JF8USAtS6NfPrLn3485L/advxyI4aiUv/m4yaaA==&clientId=default`
                 , {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
                     method: 'post',
                     body: JSON.stringify(requestBody)
                 })
@@ -118,14 +122,14 @@ export const reducer: Reducer<DataSourcesState> = (state: DataSourcesState, inco
     switch (action.type) {
         case 'REQUEST_DATASOURCES':
             return {
-                startDateIndex: (action.startDateIndex != -1 ? action.startDateIndex : 0),
+                startDateIndex: (action.startDateIndex > -1 ? action.startDateIndex : 0),
                 datasources: state.datasources,
                 isLoading: true
             };
         case 'RECEIVE_DATASOURCES':
             // Only accept the incoming data if it matches the most recent request. This ensures we correctly
             // handle out-of-order responses.
-            if (action.startDateIndex === state.startDateIndex || action.startDateIndex != -1) {
+            if (action.startDateIndex === state.startDateIndex || action.startDateIndex > -1 ) {
                 return {
                     startDateIndex: (action.startDateIndex != -1 ? action.startDateIndex : 0),
                     datasources: action.datasources,
@@ -137,9 +141,9 @@ export const reducer: Reducer<DataSourcesState> = (state: DataSourcesState, inco
         case 'SUBMIT_DATAREQUEST':
             // Only accept the incoming data if it matches the most recent request. This ensures we correctly
             // handle out-of-order responses.
-            if (action.forDataSource != '' && action.startDateIndex == -1) {
+            if (action.forDataSource != '' && action.startDateIndex == -2) {
                 return {
-                    startDateIndex: (action.startDateIndex != -1 ? action.startDateIndex : 0),
+                    startDateIndex: (action.startDateIndex > -1  ? action.startDateIndex : 0),
                     isLoading: false,
                     forDataSource: action.forDataSource,
                     datasources: state.datasources
@@ -150,11 +154,12 @@ export const reducer: Reducer<DataSourcesState> = (state: DataSourcesState, inco
         case 'SUBMIT_DATAREQUEST_COMPLETE':
             // Only accept the incoming data if it matches the most recent request. This ensures we correctly
             // handle out-of-order responses.
-            if (action.startDateIndex === state.startDateIndex || action.startDateIndex != -1) {
+            if (action.forDataSource != state.forDataSource) {
                 return {
-                    startDateIndex: (action.startDateIndex != -1 ? action.startDateIndex : 0),
+                    startDateIndex: (action.startDateIndex > -1  ? action.startDateIndex : 0),
                     isLoading: false,
-                    datasources: state.datasources
+                    datasources: state.datasources,
+                    forDataSource: action.forDataSource
                 };
             }
             break;

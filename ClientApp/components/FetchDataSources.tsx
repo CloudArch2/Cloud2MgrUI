@@ -54,7 +54,7 @@ class FetchDataSources extends React.Component<DataSourceProps, {}> {
     }
 
     private renderDataSourcesTable() {
-        let submitIndex = -1;
+        let submitIndex = -2;
         return <table className='table'>
             <thead>
                 <tr>

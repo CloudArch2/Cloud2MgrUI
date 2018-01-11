@@ -43,7 +43,7 @@ type KnownAction = RequestDataSourcesAction | ReceiveDataSourcesAction;
 export const actionCreators = {
     requestDataSources: (startDateIndex: number): AppThunkAction<KnownAction> => (dispatch, getState) => {
         // Only load data if it's something we don't already have (and are not already loading)
-        if (startDateIndex !== getState().dataSources.startDateIndex || startDateIndex < 0) {
+        if (startDateIndex !== getState().dataSources.startDateIndex) {
             let fetchTask = fetch(`api/DataSourcesDummyData/DataSources?startDateIndex=${startDateIndex}`)
                 .then(response => response.json() as Promise<DataSource[]>)
                 .then(data => {
@@ -66,16 +66,16 @@ export const reducer: Reducer<DataSourcesState> = (state: DataSourcesState, inco
     switch (action.type) {
         case 'REQUEST_DATASOURCES':
             return {
-                startDateIndex: action.startDateIndex,
+                startDateIndex: (action.startDateIndex != -1 ? action.startDateIndex : 0),
                 datasources: state.datasources,
                 isLoading: true
             };
         case 'RECEIVE_DATASOURCES':
             // Only accept the incoming data if it matches the most recent request. This ensures we correctly
             // handle out-of-order responses.
-            if (action.startDateIndex === state.startDateIndex || action.startDateIndex < 0) {
+            if (action.startDateIndex === state.startDateIndex || action.startDateIndex != -1) {
                 return {
-                    startDateIndex: action.startDateIndex,
+                    startDateIndex: (action.startDateIndex != -1 ? action.startDateIndex : 0),
                     datasources: action.datasources,
                     isLoading: false
                 };

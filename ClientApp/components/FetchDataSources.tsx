@@ -8,7 +8,7 @@ import * as DataSourcesState from '../store/DataSources';
 type DataSourceProps =
     DataSourcesState.DataSourcesState        // ... state we've requested from the Redux store
     & typeof DataSourcesState.actionCreators      // ... plus action creators we've requested
-    & RouteComponentProps<{ startDateIndex: string }>; // ... plus incoming routing parameters
+    & RouteComponentProps<{ startDateIndex: string}>; // ... plus incoming routing parameters
 
 class FetchDataSources extends React.Component<DataSourceProps, {}> {
     componentWillMount() {
@@ -59,7 +59,8 @@ class FetchDataSources extends React.Component<DataSourceProps, {}> {
 
         return <p className='clearfix text-center'>
             <Link className='btn btn-default pull-left' to={`/fetchdatasources/${refreshIndex}`}>Refresh</Link>
-            {this.props.isLoading ? <span>Loading...</span> : []}
+            {//this.props.isLoading ? <span>Loading...</span> : []
+            }
         </p>;
         /*return <p className='clearfix text-center'>
             <Link className='btn btn-default pull-left' to={`/fetchdatasources/${prevStartDateIndex}`}>Previous</Link>

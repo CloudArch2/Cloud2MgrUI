@@ -48,7 +48,7 @@ export const actionCreators = {
         // Only load data if it's something we don't already have (and are not already loading)
         if (startDateIndex !== getState().dataSources.startDateIndex) {
             let fetchTask = fetch(`metadataendpoint`)
-                .then(response => response.json() as Promise<DataSourceResult[]>)
+                .then(response => response.json() as Promise<DataSourceResult>)
                 .then(data => {
                     dispatch({ type: 'RECEIVE_DATASOURCES', startDateIndex: startDateIndex, datasources: data.Sources });
                 });
@@ -79,7 +79,7 @@ export const reducer: Reducer<DataSourcesState> = (state: DataSourcesState, inco
             if (action.startDateIndex === state.startDateIndex) {
                 return {
                     startDateIndex: action.startDateIndex,
-                    forecasts: action.datasources,
+                    datasources: action.datasources,
                     isLoading: false
                 };
             }

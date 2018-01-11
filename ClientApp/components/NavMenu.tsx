@@ -18,13 +18,13 @@ export class NavMenu extends React.Component<{}, {}> {
                 <div className='navbar-collapse collapse'>
                     <ul className='nav navbar-nav'>
                         <li>
-                            <NavLink to={'/fetchdatasources'} activeClassName='active'>
-                                <span className='glyphicon glyphicon-th-list'></span> Get Meta Data
+                            <NavLink exact to={ '/' } activeClassName='active'>
+                                <span className='glyphicon glyphicon-home'></span> Home
                             </NavLink>
                         </li>
                         <li>
-                            <NavLink exact to={ '/' } activeClassName='active'>
-                                <span className='glyphicon glyphicon-home'></span> Home
+                            <NavLink to={'/fetchdatasources'} activeClassName='active'>
+                                <span className='glyphicon glyphicon-th-list'></span> Get Meta Data
                             </NavLink>
                         </li>
                         <li>

@@ -11,13 +11,10 @@ export interface DataSourcesState {
     datasources: DataSource[];
 }
 
-export interface DataSourceResult {
-    Sources: DataSource[]
-}
 
 export interface DataSource {
-    name: string;
-    fields: string[];
+    commonName: string;
+    fieldX: string[];
 }
 
 // -----------------
@@ -47,10 +44,10 @@ export const actionCreators = {
     requestDataSources: (startDateIndex: number): AppThunkAction<KnownAction> => (dispatch, getState) => {
         // Only load data if it's something we don't already have (and are not already loading)
         if (startDateIndex !== getState().dataSources.startDateIndex || startDateIndex < 0) {
-            let fetchTask = fetch(`metadataendpoint`)
-                .then(response => response.json() as Promise<DataSourceResult>)
+            let fetchTask = fetch(`api/DataSourcesDummyData/DataSources?startDateIndex=${startDateIndex}`)
+                .then(response => response.json() as Promise<DataSource[]>)
                 .then(data => {
-                    dispatch({ type: 'RECEIVE_DATASOURCES', startDateIndex: startDateIndex, datasources: data.Sources });
+                    dispatch({ type: 'RECEIVE_DATASOURCES', startDateIndex: startDateIndex, datasources: data });
                 });
 
             addTask(fetchTask); // Ensure server-side prerendering waits for this to complete
@@ -76,7 +73,7 @@ export const reducer: Reducer<DataSourcesState> = (state: DataSourcesState, inco
         case 'RECEIVE_DATASOURCES':
             // Only accept the incoming data if it matches the most recent request. This ensures we correctly
             // handle out-of-order responses.
-            if (action.startDateIndex === state.startDateIndex) {
+            if (action.startDateIndex === state.startDateIndex || action.startDateIndex < 0) {
                 return {
                     startDateIndex: action.startDateIndex,
                     datasources: action.datasources,

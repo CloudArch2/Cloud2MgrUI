@@ -42,15 +42,11 @@ class FetchDataSources extends React.Component<DataSourceProps, {}> {
                 </tr>
             </thead>
             <tbody>
-                {this.props.datasources.map(datasource =>
-                    <tr key={datasource.name}>
-                        <td>{datasource.fields}</td>
-                        <td>TBD</td>
-                    </tr>
-                )}
+                <tr><td>
+                <textarea>{this.props.datasources}</textarea></td></tr>
             </tbody>
         </table>;
-    }
+        
 
     private renderPagination() {
         let prevStartDateIndex = (this.props.startDateIndex || 0) - 5;
